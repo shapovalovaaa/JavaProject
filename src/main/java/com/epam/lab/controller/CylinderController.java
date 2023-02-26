@@ -22,14 +22,14 @@ public class CylinderController {
     public Cylinder cylinderVolume(@RequestParam("height") double height, @RequestParam ("radius") double radius)
     throws ValueException {
         if (!validParam(height) || !validParam(radius))
-            throw new ValueException(HttpStatus.BAD_REQUEST,"invalid input");
+            throw new ValueException(HttpStatus.BAD_REQUEST,"Invalid input");
 
         Cylinder cylinder = new Cylinder(height, radius);
         volumeService.setVolumeService(cylinder);
         double volume = volumeService.count();
 
         if(!validParam(volume))
-            throw new ValueException(HttpStatus.NOT_FOUND, "value of result is out of range");
+            throw new ValueException(HttpStatus.NOT_FOUND, "Value of result is out of range");
         cylinder.setVolume(volume);
         logger.info("Successfully getMapping");
         return cylinder;
@@ -44,7 +44,7 @@ public class CylinderController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     // обработчик unchecked ошибок
     public ResponseEntity<String> handleMyException(ValueException e) {
-        logger.warn("error 400");
+        logger.warn("Error 400");
         return new ResponseEntity<>("<h1>Error 400<br></h1>" + ValueException.class + e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
@@ -52,7 +52,7 @@ public class CylinderController {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     // обработчик unchecked ошибок
     public ResponseEntity<String> handleUnchecked(RuntimeException e) {
-        logger.warn("error 500");
+        logger.warn("Error 500");
         return new ResponseEntity<>("<h1>Error 500<br></h1>" + RuntimeException.class + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

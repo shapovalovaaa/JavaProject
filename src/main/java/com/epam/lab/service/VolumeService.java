@@ -23,7 +23,7 @@ public class VolumeService {
         double volume = 2 * Math.PI * cylinder.getHeight() * cylinder.getRadius();
         double scale = Math.pow(10, 3);
         double result = Math.ceil(volume * scale) / scale;
-        logger.info("count result");
+        logger.info("Count result");
         return result;
     }
 }
