@@ -30,8 +30,9 @@ public class CylinderController {
 
         if(!validParam(volume))
             throw new ValueException(HttpStatus.NOT_FOUND, "value of result is out of range");
+        cylinder.setVolume(volume);
         logger.info("Successfully getMapping");
-        return new Cylinder(height, radius, volume);
+        return cylinder;
     }
     public boolean validParam(double param) {
         if (param <= 0 || param > Double.MAX_VALUE)
