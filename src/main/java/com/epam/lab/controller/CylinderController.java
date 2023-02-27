@@ -1,8 +1,9 @@
 package com.epam.lab.controller;
 
 import com.epam.lab.entity.Cylinder;
-import com.epam.lab.exception.ValueException;
 import com.epam.lab.service.VolumeService;
+import com.epam.lab.validators.ParamValidator;
+import com.epam.lab.validators.ValidationParamError;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
@@ -14,45 +15,56 @@ import org.springframework.web.bind.annotation.*;
 public class CylinderController {
     private static final Logger logger = LogManager.getLogger(CylinderController.class);
     private final VolumeService volumeService;
+    private ParamValidator paramValidator;
 
-    public CylinderController(VolumeService volumeService) {
+    public CylinderController(final VolumeService volumeService, ParamValidator paramValidator) {
         this.volumeService = volumeService;
+        this.paramValidator = paramValidator;
     }
     @GetMapping(path="/countCylinderVolume")
-    public Cylinder cylinderVolume(@RequestParam("height") double height, @RequestParam ("radius") double radius)
-    throws ValueException {
-        if (!validParam(height) || !validParam(radius))
-            throw new ValueException(HttpStatus.BAD_REQUEST, "Invalid parameter input");
+    public ResponseEntity<Object> cylinderVolume(@RequestParam("height") double height, @RequestParam ("radius") double radius)
+    {
+        ValidationParamError response = paramValidator.validateParam(height);
+        ValidationParamError responseRadius = paramValidator.validateParam(radius);
 
-        Cylinder cylinder = new Cylinder(height, radius);
-        volumeService.setVolumeService(cylinder);
-        double volume = volumeService.count();
-
-        if(!validParam(volume))
-            throw new ValueException(HttpStatus.NOT_FOUND, "Result value is out of bound of type Double");
-        cylinder.setVolume(volume);
-        logger.info("Successfully getMapping");
-        return cylinder;
+        if(response.getErrorMessages().size() != 0){
+            response.setStatus(HttpStatus.BAD_REQUEST);
+            logger.error("Height argument is not valid");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+        if(responseRadius.getErrorMessages().size() != 0){
+            responseRadius.setStatus(HttpStatus.BAD_REQUEST);
+            logger.error("Radius argument is not valid");
+            return new ResponseEntity<>(responseRadius, HttpStatus.BAD_REQUEST);
+        }
+        try {
+            Cylinder cylinder = new Cylinder(height, radius);
+            double volume = volumeService.count(cylinder);
+            if (!(paramValidator.validateParam(volume).getErrorMessages().size() != 0)) {
+                cylinder.setVolume(volume);
+                logger.info("Successfully getMapping");
+                return ResponseEntity.ok(cylinder);
+            } else {
+                response.addErrorMessage("Result is not valid");
+                response.setStatus(HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
+        }
+        catch (RuntimeException e) {
+            response.addErrorMessage("Internal server error");
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            logger.error("Internal server error occured");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
-    public boolean validParam(double param) {
-        if (param <= 0 || param > Double.MAX_VALUE)
-            return false;
-        return true;
-    }
-
-    @ExceptionHandler(ValueException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    // обработчик unchecked ошибок
-    public ResponseEntity<String> handleMyException(ValueException e) {
-        logger.warn("Error 400");
-        return new ResponseEntity<>("<h1>Error 400<br></h1>" + ValueException.class + e.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     // обработчик unchecked ошибок
-    public ResponseEntity<String> handleUnchecked(RuntimeException e) {
-        logger.warn("Error 500");
-        return new ResponseEntity<>("<h1>Error 500<br></h1>" + RuntimeException.class + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<Object> handleUnchecked(RuntimeException e) {
+        ValidationParamError response = new ValidationParamError();
+        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        response.addErrorMessage("Error 500: " + RuntimeException.class);
+        logger.error("Error 500");
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
