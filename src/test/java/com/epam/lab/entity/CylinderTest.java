@@ -12,14 +12,4 @@ public class CylinderTest {
         boolean result = cylinder1.equals(cylinder2);
         Assertions.assertTrue(result);
     }
-    @Test
-    void CylinderToString() {
-        Cylinder cylinder = new Cylinder();
-        cylinder.setHeight(6.66);
-        cylinder.setRadius(5.55);
-        String result = "\n" + cylinder.getClass() + "{ " +
-                "height = " + 6.66 +
-                ", radius = " + 5.55 + " }";
-        Assertions.assertEquals(cylinder.toString(), result);
-    }
 }

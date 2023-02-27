@@ -62,11 +62,4 @@ public class Cylinder {
         Cylinder cylinder = (Cylinder) o;
         return ((this.height == cylinder.height && this.radius == cylinder.radius));
     }
-
-    @Override
-    public String toString() {
-        return "\n" + getClass() + "{ " +
-                "height = " + height +
-                ", radius = " + radius + " }";
-    }
 }
