@@ -22,14 +22,14 @@ public class CylinderController {
     public Cylinder cylinderVolume(@RequestParam("height") double height, @RequestParam ("radius") double radius)
     throws ValueException {
         if (!validParam(height) || !validParam(radius))
-            throw new ValueException(HttpStatus.BAD_REQUEST,"Invalid input");
+            throw new ValueException(HttpStatus.BAD_REQUEST, "Invalid parameter input");
 
         Cylinder cylinder = new Cylinder(height, radius);
         volumeService.setVolumeService(cylinder);
         double volume = volumeService.count();
 
         if(!validParam(volume))
-            throw new ValueException(HttpStatus.NOT_FOUND, "Value of result is out of range");
+            throw new ValueException(HttpStatus.NOT_FOUND, "Result value is out of bound of type Double");
         cylinder.setVolume(volume);
         logger.info("Successfully getMapping");
         return cylinder;
