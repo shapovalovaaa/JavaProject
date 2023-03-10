@@ -40,7 +40,7 @@ public class CylinderController {
         try {
             Cylinder cylinder = new Cylinder(height, radius);
             double volume = volumeService.count(cylinder);
-            if (!(paramValidator.validateParam(volume).getErrorMessages().size() != 0)) {
+            if (paramValidator.validateParam(volume).getErrorMessages().size() == 0) {
                 cylinder.setVolume(volume);
                 logger.info("Successfully getMapping");
                 return ResponseEntity.ok(cylinder);
