@@ -1,6 +1,5 @@
 package com.epam.lab.validators;
 
-import com.epam.lab.exception.ValueException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
