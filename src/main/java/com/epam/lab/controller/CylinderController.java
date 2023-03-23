@@ -1,5 +1,6 @@
 package com.epam.lab.controller;
 
+import com.epam.lab.cash.InMemoryCash;
 import com.epam.lab.entity.Cylinder;
 import com.epam.lab.service.VolumeService;
 import com.epam.lab.validators.ParamValidator;
@@ -10,16 +11,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("api/lab")
 public class CylinderController {
     private static final Logger logger = LogManager.getLogger(CylinderController.class);
     private final VolumeService volumeService;
     private ParamValidator paramValidator;
+    private InMemoryCash inMemoryCash;
 
-    public CylinderController(final VolumeService volumeService, ParamValidator paramValidator) {
+    public CylinderController(final VolumeService volumeService, ParamValidator paramValidator,
+                              InMemoryCash inMemoryCash) {
         this.volumeService = volumeService;
         this.paramValidator = paramValidator;
+        this.inMemoryCash = inMemoryCash;
     }
     @GetMapping(path="/countCylinderVolume")
     public ResponseEntity<Object> cylinderVolume(@RequestParam("height") double height, @RequestParam ("radius") double radius)
@@ -43,6 +49,7 @@ public class CylinderController {
             ValidationParamError r = paramValidator.validateParam(volume);
             if (r.getErrorMessages().size() == 0) {
                 cylinder.setVolume(volume);
+                inMemoryCash.saveCylinder(cylinder);
                 logger.info("Successfully getMapping");
                 return ResponseEntity.ok(cylinder);
             } else {
@@ -67,5 +74,16 @@ public class CylinderController {
         response.addErrorMessage("Error 500: " + RuntimeException.class);
         logger.error("Error 500");
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @GetMapping(path="/cylinders")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<List<Cylinder>> getAllCylinders() {
+        return ResponseEntity.ok(inMemoryCash.getAllSavedCylinders());
+    }
+    @GetMapping(path="/cylinders/size")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Integer> getCylindersCount() {
+        return ResponseEntity.ok(inMemoryCash.getCylinderCount());
     }
 }

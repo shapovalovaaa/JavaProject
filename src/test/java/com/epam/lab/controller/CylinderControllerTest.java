@@ -1,5 +1,6 @@
 package com.epam.lab.controller;
 
+import com.epam.lab.cash.InMemoryCash;
 import com.epam.lab.entity.Cylinder;
 import com.epam.lab.service.VolumeService;
 import com.epam.lab.validators.ParamValidator;
@@ -18,8 +19,9 @@ import static org.mockito.Mockito.when;
 public class CylinderControllerTest {
     private VolumeService volumeService = mock(VolumeService.class);
     private ParamValidator paramValidator = mock(ParamValidator.class);
+    private InMemoryCash inMemoryCash = new InMemoryCash();
     @InjectMocks
-    private CylinderController cylinderController = new CylinderController(volumeService, paramValidator);
+    private CylinderController cylinderController = new CylinderController(volumeService, paramValidator, inMemoryCash);
     private static final Cylinder cylinder = mock(Cylinder.class);
     @BeforeAll
     public static void setup () {
@@ -32,14 +34,17 @@ public class CylinderControllerTest {
         when(paramValidator.validateParam(0)).thenReturn(new ValidationParamError("Bad Request", HttpStatus.BAD_REQUEST));
         when(paramValidator.validateParam(cylinder.getHeight())).thenReturn(new ValidationParamError());
         when(paramValidator.validateParam(cylinder.getRadius())).thenReturn(new ValidationParamError());
-
+        when(paramValidator.validateParam(1000000000000.0)).thenReturn(new ValidationParamError());
+        when(paramValidator.validateParam(17*10^95)).thenReturn(new ValidationParamError());
         ResponseEntity<Object> case1 = cylinderController.cylinderVolume(0, Double.MAX_VALUE + 1);
         ResponseEntity<Object> case2 = cylinderController.cylinderVolume(0, cylinder.getRadius());
         ResponseEntity<Object> case3 = cylinderController.cylinderVolume(cylinder.getHeight(), Double.MAX_VALUE + 1);
+        ResponseEntity<Object> case4 = cylinderController.cylinderVolume(1000000000000.0, 17*10^95);
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, case1.getStatusCode());
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, case2.getStatusCode());
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, case3.getStatusCode());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, case4.getStatusCode());
     }
     @Test
     void validateParamTrue() {
@@ -53,6 +58,11 @@ public class CylinderControllerTest {
         Assertions.assertEquals(HttpStatus.OK, obj.getStatusCode());
 
     }
-
+    @Test
+    void cashTest() {
+        inMemoryCash.saveCylinder(cylinder);
+        Assertions.assertEquals(ResponseEntity.ok(inMemoryCash.getCylinderCount()), cylinderController.getCylindersCount());
+        Assertions.assertEquals(ResponseEntity.ok(inMemoryCash.getAllSavedCylinders()), cylinderController.getAllCylinders());
+    }
 }
 
