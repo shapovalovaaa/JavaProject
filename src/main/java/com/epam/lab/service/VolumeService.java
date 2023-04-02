@@ -1,5 +1,7 @@
 package com.epam.lab.service;
 
+import com.epam.lab.counter.RequestCounterThread;
+import com.epam.lab.counter.Synchronization;
 import com.epam.lab.entity.Cylinder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

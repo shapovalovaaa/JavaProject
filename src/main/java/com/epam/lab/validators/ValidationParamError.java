@@ -1,5 +1,6 @@
 package com.epam.lab.validators;
 
+import com.epam.lab.entity.Cylinder;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -7,10 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 @Component
 public class ValidationParamError {
+    private Cylinder cylinder;
     private List<String> errorMessages;
     private HttpStatus status;
 
     public ValidationParamError() {
+        this.cylinder = new Cylinder();
         this.errorMessages = new ArrayList<>();
         this.status = HttpStatus.OK;
     }
@@ -31,5 +34,11 @@ public class ValidationParamError {
 
     public List<String> getErrorMessages() {
         return errorMessages;
+    }
+    public void setCylinder(Cylinder cylinder) {
+        this.cylinder = cylinder;
+    }
+    public Cylinder getCylinder() {
+        return this.cylinder;
     }
 }

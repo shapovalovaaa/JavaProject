@@ -36,6 +36,7 @@ public class CylinderControllerTest {
         when(paramValidator.validateParam(cylinder.getRadius())).thenReturn(new ValidationParamError());
         when(paramValidator.validateParam(1000000000000.0)).thenReturn(new ValidationParamError());
         when(paramValidator.validateParam(17*10^95)).thenReturn(new ValidationParamError());
+
         ResponseEntity<Object> case1 = cylinderController.cylinderVolume(0, Double.MAX_VALUE + 1);
         ResponseEntity<Object> case2 = cylinderController.cylinderVolume(0, cylinder.getRadius());
         ResponseEntity<Object> case3 = cylinderController.cylinderVolume(cylinder.getHeight(), Double.MAX_VALUE + 1);
@@ -51,18 +52,17 @@ public class CylinderControllerTest {
         Cylinder c = new Cylinder(5.25, 7.3);
         when(paramValidator.validateParam(c.getHeight())).thenReturn(new ValidationParamError());
         when(paramValidator.validateParam(c.getRadius())).thenReturn(new ValidationParamError());
-
         when(volumeService.count(c)).thenReturn(240.804);
         when(paramValidator.validateParam(240.804)).thenReturn(new ValidationParamError());
+
         ResponseEntity<Object> obj = cylinderController.cylinderVolume(c.getHeight(), c.getRadius());
         Assertions.assertEquals(HttpStatus.OK, obj.getStatusCode());
-
     }
     @Test
     void cashTest() {
         inMemoryCash.saveCylinder(cylinder);
-        Assertions.assertEquals(ResponseEntity.ok(inMemoryCash.getCylinderCount()), cylinderController.getCylindersCount());
         Assertions.assertEquals(ResponseEntity.ok(inMemoryCash.getAllSavedCylinders()), cylinderController.getAllCylinders());
+        Assertions.assertEquals(inMemoryCash.getCylinderCount(), cylinderController.getCylindersCount().getCounter());
     }
 }
 
