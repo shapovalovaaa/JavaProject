@@ -13,7 +13,7 @@ public class ValidationParamError {
     private HttpStatus status;
 
     public ValidationParamError() {
-        this.cylinder = new Cylinder();
+       // this.cylinder = new Cylinder();
         this.errorMessages = new ArrayList<>();
         this.status = HttpStatus.OK;
     }
@@ -21,6 +21,12 @@ public class ValidationParamError {
         this.errorMessages = new ArrayList<>();
         errorMessages.add(message);
         this.status = status;
+    }
+    public ValidationParamError(String message, HttpStatus status, Cylinder cylinder) {
+        this.errorMessages = new ArrayList<>();
+        errorMessages.add(message);
+        this.status = status;
+        this.cylinder = cylinder;
     }
     public void addErrorMessage(String errorMessage) {
         this.errorMessages.add(errorMessage);

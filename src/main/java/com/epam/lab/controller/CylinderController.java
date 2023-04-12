@@ -4,16 +4,20 @@ import com.epam.lab.cash.InMemoryCash;
 import com.epam.lab.counter.RequestCounterThread;
 import com.epam.lab.counter.RequestResponse;
 import com.epam.lab.entity.Cylinder;
+import com.epam.lab.entity.PostMappingObject;
 import com.epam.lab.service.VolumeService;
 import com.epam.lab.validators.ParamValidator;
 import com.epam.lab.validators.ValidationParamError;
+import org.apache.coyote.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedList;
 import java.util.List;
 
 @RestController
@@ -32,7 +36,7 @@ public class CylinderController {
         this.inMemoryCash = inMemoryCash;
     }
     @GetMapping(path="/countCylinderVolume")
-    public ResponseEntity<Object> cylinderVolume(@RequestParam("height") double height, @RequestParam ("radius") double radius)
+    public ResponseEntity<Object> cylinderVolume(@RequestParam("height") Double height, @RequestParam ("radius") Double radius)
     {
         RequestCounterThread t = new RequestCounterThread();
 
@@ -52,7 +56,7 @@ public class CylinderController {
         }
         try {
             Cylinder cylinder = new Cylinder(height, radius);
-            double volume = volumeService.count(cylinder);
+            Double volume = volumeService.count(cylinder);
             ValidationParamError responseVolume = paramValidator.validateParam(volume);
             if (responseVolume.getErrorMessages().size() == 0) {
                 cylinder.setVolume(volume);
@@ -90,5 +94,46 @@ public class CylinderController {
     @ResponseStatus(HttpStatus.OK)
     public RequestResponse getCylindersCount() {
         return new RequestResponse("size", inMemoryCash.getCylinderCount());
+    }
+
+    @PostMapping("/countCylinderVolume")
+    public ResponseEntity<Object> cylinderBulkVolume (@Validated @RequestBody List<Cylinder> cylinderList) {
+
+        List<ValidationParamError> resultList = new LinkedList<>();
+        List<Double> resultDoubleList = new LinkedList<>();
+        cylinderList.forEach((currentElement) -> {
+            ValidationParamError responseHeight = paramValidator.validateParam(currentElement.getHeight());
+            ValidationParamError responseRadius = paramValidator.validateParam(currentElement.getRadius());
+            ValidationParamError response = new ValidationParamError("Invalid argument", HttpStatus.BAD_REQUEST);
+            boolean errorFlag = false;
+
+            if(responseHeight.getErrorMessages().size() != 0){
+                responseHeight.setStatus(HttpStatus.BAD_REQUEST);
+                logger.error("Height argument is not valid");
+                errorFlag = true;
+            }
+            if(responseRadius.getErrorMessages().size() != 0){
+                responseRadius.setStatus(HttpStatus.BAD_REQUEST);
+                logger.error("Radius argument is not valid");
+                errorFlag = true;
+            }
+            if(errorFlag)
+                resultList.add(response);
+            else
+            {
+                resultList.add(new ValidationParamError("", HttpStatus.OK,
+                        new Cylinder(currentElement.getHeight(), currentElement.getRadius(), volumeService.count(currentElement))));
+                resultDoubleList.add(volumeService.count(currentElement));
+            }
+        });
+
+        logger.info("Successfully postMapping");
+        Double sumResult = volumeService.countSumOfResult(resultDoubleList);
+        Double maxResult = volumeService.findMaxValue(resultDoubleList);
+        Double minResult = volumeService.findMinValue(resultDoubleList);
+        Double medianResult = volumeService.countMedianOfResult(resultDoubleList);
+        PostMappingObject info = new PostMappingObject(resultList, resultDoubleList, sumResult, minResult, maxResult, medianResult);
+        logger.info("Successfully postMapping result");
+        return new ResponseEntity<>(info, HttpStatus.CREATED);
     }
 }

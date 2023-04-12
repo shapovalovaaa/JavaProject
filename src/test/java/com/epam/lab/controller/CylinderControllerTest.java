@@ -31,16 +31,16 @@ public class CylinderControllerTest {
     @Test
     public void validateParamFalse () {
         when(paramValidator.validateParam(Double.MAX_VALUE + 1)).thenReturn(new ValidationParamError("Bad Request", HttpStatus.BAD_REQUEST));
-        when(paramValidator.validateParam(0)).thenReturn(new ValidationParamError("Bad Request", HttpStatus.BAD_REQUEST));
+        when(paramValidator.validateParam(0.0)).thenReturn(new ValidationParamError("Bad Request", HttpStatus.BAD_REQUEST));
         when(paramValidator.validateParam(cylinder.getHeight())).thenReturn(new ValidationParamError());
         when(paramValidator.validateParam(cylinder.getRadius())).thenReturn(new ValidationParamError());
         when(paramValidator.validateParam(1000000000000.0)).thenReturn(new ValidationParamError());
-        when(paramValidator.validateParam(17*10^95)).thenReturn(new ValidationParamError());
+        when(paramValidator.validateParam(17.0*(10^95))).thenReturn(new ValidationParamError());
 
-        ResponseEntity<Object> case1 = cylinderController.cylinderVolume(0, Double.MAX_VALUE + 1);
-        ResponseEntity<Object> case2 = cylinderController.cylinderVolume(0, cylinder.getRadius());
+        ResponseEntity<Object> case1 = cylinderController.cylinderVolume(0.0, Double.MAX_VALUE + 1);
+        ResponseEntity<Object> case2 = cylinderController.cylinderVolume(0.0, cylinder.getRadius());
         ResponseEntity<Object> case3 = cylinderController.cylinderVolume(cylinder.getHeight(), Double.MAX_VALUE + 1);
-        ResponseEntity<Object> case4 = cylinderController.cylinderVolume(1000000000000.0, 17*10^95);
+        ResponseEntity<Object> case4 = cylinderController.cylinderVolume(1000000000000.0, 17.0*(10^95));
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, case1.getStatusCode());
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, case2.getStatusCode());

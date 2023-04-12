@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 public class ParamValidator {
     private static final Logger logger = LogManager.getLogger(ParamValidator.class);
 
-    public ValidationParamError validateParam (double param) {
+    public ValidationParamError validateParam (Double param) {
         ValidationParamError response = new ValidationParamError();
-        if (param <= 0) {
+        if (param <= 0.0) {
             logger.error("Param value can't be less or equal to zero (<=0)");
             response.addErrorMessage("Param can't be less or equal to zero (<=0)");
         }

@@ -4,21 +4,22 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class Cylinder {
-    private double height;
-    private double radius;
-    private double volume;
+    private Double height;
+    private Double radius;
+    private Double volume;
+
     public Cylinder() {
-        this.height = 0;
-        this.radius = 0;
-        this.volume = 0;
+        this.height = 0.0;
+        this.radius = 0.0;
+        this.volume = 0.0;
     }
 
-    public Cylinder(double height, double radius) {
+    public Cylinder(Double height, Double radius) {
         this.height = height;
         this.radius = radius;
-        this.volume = 0;
+        this.volume = 0.0;
     }
-    public Cylinder(double height, double radius, double volume) {
+    public Cylinder(Double height, Double radius, Double volume) {
         this.height = height;
         this.radius = radius;
         this.volume = volume;
@@ -30,35 +31,35 @@ public class Cylinder {
         this.volume = cylinder.getVolume();
     }
 
-    public double getHeight() {
+    public Double getHeight() {
         return height;
     }
 
-    public void setHeight(double height) {
+    public void setHeight(Double height) {
         this.height = height;
     }
 
-    public double getRadius() {
+    public Double getRadius() {
         return radius;
     }
 
-    public void setRadius(double radius) {
+    public void setRadius(Double radius) {
         this.radius = radius;
     }
 
-    public double getVolume() {
+    public Double getVolume() {
         return volume;
     }
 
-    public void setVolume(double volume) {
+    public void setVolume(Double volume) {
         this.volume = volume;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null) return false;
-        if (o == null || getClass() != o.getClass()) return false;
+        /*if (o == null) return false;
+        if (o == null || getClass() != o.getClass()) return false;*/
 
         Cylinder cylinder = (Cylinder) o;
         return ((this.height == cylinder.height && this.radius == cylinder.radius));
