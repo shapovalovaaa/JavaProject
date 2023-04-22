@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -46,7 +47,6 @@ public class CylinderController {
         if(response.getErrorMessages().size() != 0){
             response.setStatus(HttpStatus.BAD_REQUEST);
             logger.error("Height argument is not valid");
-
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
         if(responseRadius.getErrorMessages().size() != 0){
@@ -105,7 +105,7 @@ public class CylinderController {
             ValidationParamError responseHeight = paramValidator.validateParam(currentElement.getHeight());
             ValidationParamError responseRadius = paramValidator.validateParam(currentElement.getRadius());
             ValidationParamError response = new ValidationParamError("Invalid argument", HttpStatus.BAD_REQUEST);
-            boolean errorFlag = false;
+            Boolean errorFlag = false;
 
             if(responseHeight.getErrorMessages().size() != 0){
                 responseHeight.setStatus(HttpStatus.BAD_REQUEST);
@@ -123,17 +123,17 @@ public class CylinderController {
             {
                 resultList.add(new ValidationParamError("", HttpStatus.OK,
                         new Cylinder(currentElement.getHeight(), currentElement.getRadius(), volumeService.count(currentElement))));
+                inMemoryCash.saveCylinder(new Cylinder(currentElement.getHeight(), currentElement.getRadius(),
+                        volumeService.count(currentElement)));
                 resultDoubleList.add(volumeService.count(currentElement));
             }
         });
-
-        logger.info("Successfully postMapping");
         Double sumResult = volumeService.countSumOfResult(resultDoubleList);
-        Double maxResult = volumeService.findMaxValue(resultDoubleList);
-        Double minResult = volumeService.findMinValue(resultDoubleList);
+        Double maxResult = Collections.max(resultDoubleList);
+        Double minResult = Collections.min(resultDoubleList);
         Double medianResult = volumeService.countMedianOfResult(resultDoubleList);
         PostMappingObject info = new PostMappingObject(resultList, sumResult, minResult, maxResult, medianResult);
-        logger.info("Successfully postMapping result");
+        logger.info("Successfully postMapping");
         return new ResponseEntity<>(info, HttpStatus.CREATED);
     }
 }

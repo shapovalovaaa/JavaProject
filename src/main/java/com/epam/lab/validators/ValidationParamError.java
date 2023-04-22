@@ -13,7 +13,6 @@ public class ValidationParamError {
     private HttpStatus status;
 
     public ValidationParamError() {
-       // this.cylinder = new Cylinder();
         this.errorMessages = new ArrayList<>();
         this.status = HttpStatus.OK;
     }

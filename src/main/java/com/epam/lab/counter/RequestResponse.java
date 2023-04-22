@@ -1,17 +1,17 @@
 package com.epam.lab.counter;
 
 public class RequestResponse {
-    private int counter;
+    private Integer counter;
     private String responseMessage;
     public RequestResponse() {
         this.counter = 0;
         this.responseMessage = "";
     }
-    public RequestResponse (String responseMessage, int counter) {
+    public RequestResponse (String responseMessage, Integer counter) {
         this.counter = counter;
         this.responseMessage = responseMessage;
     }
-    public int getCounter() {
+    public Integer getCounter() {
         return counter;
     }
     public void setCounter(int counter) {

@@ -29,24 +29,6 @@ public class VolumeService {
         logger.info("Count sum of results");
         return result;
     }
-
-    public Double findMinValue(List<Double> resultList) {
-        Double min = 0.0;
-        if (!resultList.isEmpty()) {
-            min = resultList.stream().mapToDouble(Double::doubleValue).min().getAsDouble();
-        }
-        logger.info("Find min value");
-        return min;
-    }
-
-    public Double findMaxValue(List<Double> resultList) {
-        Double max = 0.0;
-        if (!resultList.isEmpty()) {
-            max = resultList.stream().mapToDouble(Double::doubleValue).max().getAsDouble();
-        }
-        logger.info("Find max value");
-        return max;
-    }
     public Double countMedianOfResult(List<Double> resultList) {
         Double median = 0.0;
         if (!resultList.isEmpty()) {
