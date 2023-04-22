@@ -6,17 +6,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class PostMappingObject {
-    private List<Double> volumes = new LinkedList<>();
     private List<ValidationParamError> allObjects = new LinkedList<>();
     private Double sum;
     private Double minResult;
     private Double maxResult;
 
     private Double medianResult;
-    public PostMappingObject(List<ValidationParamError> allObjects, List<Double> volumes,
-                             Double sum, Double minResult, Double maxResult, Double medianResult) {
+    public PostMappingObject(List<ValidationParamError> allObjects, Double sum,
+                             Double minResult, Double maxResult, Double medianResult) {
         this.allObjects = allObjects;
-        this.volumes = volumes;
         this.sum = sum;
         this.minResult = minResult;
         this.maxResult = maxResult;
@@ -29,14 +27,6 @@ public class PostMappingObject {
 
     public void setAllObjects(List<ValidationParamError> allObjects) {
         this.allObjects = allObjects;
-    }
-
-    public List<Double> getVolumes() {
-        return volumes;
-    }
-
-    public void setVolumes(List<Double> volumes) {
-        this.volumes = volumes;
     }
 
     public Double getSum() {

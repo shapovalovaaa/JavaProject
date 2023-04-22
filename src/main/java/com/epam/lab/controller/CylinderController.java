@@ -132,7 +132,7 @@ public class CylinderController {
         Double maxResult = volumeService.findMaxValue(resultDoubleList);
         Double minResult = volumeService.findMinValue(resultDoubleList);
         Double medianResult = volumeService.countMedianOfResult(resultDoubleList);
-        PostMappingObject info = new PostMappingObject(resultList, resultDoubleList, sumResult, minResult, maxResult, medianResult);
+        PostMappingObject info = new PostMappingObject(resultList, sumResult, minResult, maxResult, medianResult);
         logger.info("Successfully postMapping result");
         return new ResponseEntity<>(info, HttpStatus.CREATED);
     }
