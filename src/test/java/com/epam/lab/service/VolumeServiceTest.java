@@ -24,8 +24,8 @@ class VolumeServiceTest {
         Double expectedMax = 99.9;
         Double expectedMedian = 25.5;
         Double expectedSum = 127.5;
-        Double maxValue = testList.stream().mapToDouble(Double::doubleValue).max().getAsDouble();
-        Double minValue = testList.stream().mapToDouble(Double::doubleValue).min().getAsDouble();
+        Double maxValue = volumeService.countMaxOfResult(testList);
+        Double minValue = volumeService.countMinOfResult(testList);
         Double medianValue = volumeService.countMedianOfResult(testList);
         Double sum = volumeService.countSumOfResult(testList);
         Assertions.assertEquals(expectedMin, minValue);

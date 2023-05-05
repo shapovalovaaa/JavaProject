@@ -8,7 +8,6 @@ import com.epam.lab.entity.PostMappingObject;
 import com.epam.lab.service.VolumeService;
 import com.epam.lab.validators.ParamValidator;
 import com.epam.lab.validators.ValidationParamError;
-import org.apache.coyote.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +77,6 @@ public class CylinderController {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<Object> handleUnchecked(RuntimeException e) {
         RequestCounterThread t = new RequestCounterThread();
-
         ValidationParamError response = new ValidationParamError();
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         response.addErrorMessage("Error 500: " + RuntimeException.class);
@@ -102,18 +100,17 @@ public class CylinderController {
         List<ValidationParamError> resultList = new LinkedList<>();
         List<Double> resultDoubleList = new LinkedList<>();
         cylinderList.forEach((currentElement) -> {
+            ValidationParamError response = new ValidationParamError("Invalid argument", HttpStatus.BAD_GATEWAY);
             ValidationParamError responseHeight = paramValidator.validateParam(currentElement.getHeight());
             ValidationParamError responseRadius = paramValidator.validateParam(currentElement.getRadius());
-            ValidationParamError response = new ValidationParamError("Invalid argument", HttpStatus.BAD_REQUEST);
             Boolean errorFlag = false;
-
             if(responseHeight.getErrorMessages().size() != 0){
-                responseHeight.setStatus(HttpStatus.BAD_REQUEST);
+                responseHeight.setStatus(HttpStatus.BAD_GATEWAY);
                 logger.error("Height argument is not valid");
                 errorFlag = true;
             }
             if(responseRadius.getErrorMessages().size() != 0){
-                responseRadius.setStatus(HttpStatus.BAD_REQUEST);
+                responseRadius.setStatus(HttpStatus.BAD_GATEWAY);
                 logger.error("Radius argument is not valid");
                 errorFlag = true;
             }
@@ -129,8 +126,8 @@ public class CylinderController {
             }
         });
         Double sumResult = volumeService.countSumOfResult(resultDoubleList);
-        Double maxResult = Collections.max(resultDoubleList);
-        Double minResult = Collections.min(resultDoubleList);
+        Double maxResult = volumeService.countMaxOfResult(resultDoubleList);
+        Double minResult = volumeService.countMinOfResult(resultDoubleList);
         Double medianResult = volumeService.countMedianOfResult(resultDoubleList);
         PostMappingObject info = new PostMappingObject(resultList, sumResult, minResult, maxResult, medianResult);
         logger.info("Successfully postMapping");

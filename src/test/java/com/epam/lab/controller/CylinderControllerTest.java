@@ -16,8 +16,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 public class CylinderControllerTest {
@@ -57,8 +56,12 @@ public class CylinderControllerTest {
         when(paramValidator.validateParam(c.getHeight())).thenReturn(new ValidationParamError());
         when(paramValidator.validateParam(c.getRadius())).thenReturn(new ValidationParamError());
         when(volumeService.count(c)).thenReturn(240.804);
-        when(paramValidator.validateParam(240.804)).thenReturn(new ValidationParamError());
 
+        ValidationParamError response = new ValidationParamError();
+        response.setCylinder(cylinder);
+        when(paramValidator.validateParam(240.804)).thenReturn(response);
+        Assertions.assertEquals(cylinder, response.getCylinder());
+        Assertions.assertEquals(HttpStatus.OK, response.getStatus());
         ResponseEntity<Object> obj = cylinderController.cylinderVolume(c.getHeight(), c.getRadius());
         Assertions.assertEquals(HttpStatus.OK, obj.getStatusCode());
     }
@@ -93,7 +96,7 @@ public class CylinderControllerTest {
         expectedResultList.add(new ValidationParamError("", HttpStatus.OK, c1));
         expectedResultList.add(new ValidationParamError("Invalid argument", HttpStatus.BAD_REQUEST));
         expectedResultList.add(new ValidationParamError("Invalid argument", HttpStatus.BAD_REQUEST));
-        expectedResultList.add(new ValidationParamError("", HttpStatus.OK, c3));
+        expectedResultList.add(new ValidationParamError("", HttpStatus.OK, c4));
 
         List<Double> expectedDoubleList = new LinkedList<>();
         expectedDoubleList.add(15.206);
@@ -107,7 +110,6 @@ public class CylinderControllerTest {
 
         ResponseEntity<Object> expectedObj = new ResponseEntity<>(expectedInfo, HttpStatus.CREATED);
         ResponseEntity<Object> obj = cylinderController.cylinderBulkVolume(cylinderList);
-
         Assertions.assertEquals(expectedObj.getStatusCode(), obj.getStatusCode());
     }
 }

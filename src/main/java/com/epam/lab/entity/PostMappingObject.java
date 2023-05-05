@@ -12,6 +12,7 @@ public class PostMappingObject {
     private Double maxResult;
 
     private Double medianResult;
+    public PostMappingObject () {}
     public PostMappingObject(List<ValidationParamError> allObjects, Double sum,
                              Double minResult, Double maxResult, Double medianResult) {
         this.allObjects = allObjects;
